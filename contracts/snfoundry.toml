@@ -1,0 +1,6 @@
+# sncast account configuration for ShieldVoucher deployments
+# Set your own RPC URL and account before deploying
+[sncast.default]
+account = "alpha"
+accounts-file = "~/.starknet_accounts/starknet_open_zeppelin_accounts.json"
+# url = "https://your-starknet-sepolia-rpc-url"

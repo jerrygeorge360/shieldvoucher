@@ -183,11 +183,13 @@ export function RedeemVoucher({ connectedAddress }: Props) {
       const { jobId } = await submitProofJob({ programSierra: CIRCUIT_SIERRA_BASE64, args })
 
       setStatusMessage(`PROVING_IN_PROGRESS (Job: ${jobId.slice(0, 8)})...`)
-      await waitForJob(jobId, (status: AtlanticJobStatus) => {
+      const { integrityFactHash } = await waitForJob(jobId, (status: AtlanticJobStatus) => {
         setStatusMessage(`ATLANTIC_STATUS: ${status}...`)
       })
 
       const recipient = recipientOverride || connectedAddress
+
+      console.log('FACT_HASH_FOR_REDEEM:', integrityFactHash)
 
       setStatusMessage('EXECUTING_FACT_BASED_REDEMPTION...')
       const redeemTxHash = await redeemVoucherWithProof(
@@ -196,7 +198,8 @@ export function RedeemVoucher({ connectedAddress }: Props) {
         tree.root,
         tokenAddr,
         amount,
-        recipient
+        recipient,
+        integrityFactHash
       )
       setTxHash(redeemTxHash)
       alert('Anonymous redemption successful!')

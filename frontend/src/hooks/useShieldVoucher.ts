@@ -187,7 +187,8 @@ export async function redeemVoucherWithProof(
   merkleRoot: string,
   tokenAddress: string,
   amount: bigint,
-  recipient: string
+  recipient: string,
+  factHash: string
 ) {
   const contractAddress = getShieldVoucherContractAddress()
   const voucher = new Contract({ abi: SHIELD_VOUCHER_ABI as any, address: contractAddress, providerOrAccount: account })
@@ -197,6 +198,7 @@ export async function redeemVoucherWithProof(
     token_address: tokenAddress,
     amount: cairo.uint256(amount),
     recipient,
+    fact_hash: factHash,
   }))
 
   await provider.waitForTransaction(tx.transaction_hash)

@@ -94,7 +94,7 @@ export async function submitProofJob(data: ProofGenerationRequest): Promise<{ jo
 /**
  * Fetches the current status of an Atlantic job.
  */
-export async function getJobStatus(jobId: string): Promise<{ status: AtlanticJobStatus; step?: string; errorReason?: string }> {
+export async function getJobStatus(jobId: string): Promise<{ status: AtlanticJobStatus; step?: string; errorReason?: string; integrityFactHash?: string }> {
     const apiKey = import.meta.env.VITE_ATLANTIC_API_KEY;
     const url = `${ATLANTIC_BASE_URL}/atlantic-query/${jobId}?apiKey=${apiKey}`;
 
@@ -109,7 +109,8 @@ export async function getJobStatus(jobId: string): Promise<{ status: AtlanticJob
     return {
         status: query.status || data.status,
         step: query.step,
-        errorReason: query.errorReason
+        errorReason: query.errorReason,
+        integrityFactHash: query.integrityFactHash || null
     };
 }
 
@@ -121,14 +122,20 @@ export async function waitForJob(
     onStatusUpdate?: (status: AtlanticJobStatus) => void,
     intervalMs: number = 15000,
     timeoutMs: number = 900000 // 15 mins for L2 verification (trace + proof + on-chain)
-): Promise<void> {
+): Promise<{ integrityFactHash: string }> {
     const start = Date.now();
 
     while (Date.now() - start < timeoutMs) {
-        const { status, step, errorReason } = await getJobStatus(jobId);
+        const { status, step, errorReason, integrityFactHash } = await getJobStatus(jobId);
         if (onStatusUpdate) onStatusUpdate(status);
 
-        if (status === 'DONE') return;
+        if (status === 'DONE') {
+            if (!integrityFactHash) {
+                throw new Error('Atlantic job completed but integrityFactHash is missing');
+            }
+            console.log('INTEGRITY_FACT_HASH:', integrityFactHash);
+            return { integrityFactHash };
+        }
         if (status === 'FAILED') {
             const details = [
                 step ? `step: ${step}` : null,

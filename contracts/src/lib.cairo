@@ -3,7 +3,6 @@
 // Deployed on Starknet Sepolia testnet
 
 mod tests;
-mod mock_verifier;
 mod mock_wbtc;
 
 use starknet::ContractAddress;
@@ -75,7 +74,8 @@ pub trait IShieldVoucher<TContractState> {
         merkle_root: felt252,
         token_address: ContractAddress,
         amount: u256,
-        recipient: ContractAddress
+        recipient: ContractAddress,
+        fact_hash: felt252
     );
     fn refund(ref self: TContractState, commitment: felt252);
     fn set_verifier(ref self: TContractState, verifier: ContractAddress);
@@ -282,7 +282,8 @@ mod ShieldVoucher {
             merkle_root: felt252,
             token_address: ContractAddress,
             amount: u256,
-            recipient: ContractAddress
+            recipient: ContractAddress,
+            fact_hash: felt252
         ) {
             assert(!self.is_paused.read(), 'Contract paused');
             assert(!self.is_locked.read(), 'Reentrancy guard');
@@ -294,34 +295,15 @@ mod ShieldVoucher {
             assert(!self.nullifier_used.read(nullifier), 'Nullifier used');
             assert(self.valid_roots.read(merkle_root), 'Invalid root');
 
-            // Build circuit output (what the circuit returns — public values only)
-            let output = array![
-                nullifier,
-                merkle_root,
-                token_address.into(),
-                amount.low.into(),
-                amount.high.into(),
-                recipient.into(),
-            ];
-
-            // NOTE: Private circuit inputs (secret, merkle_path) are intentionally
-            // NOT passed on-chain to preserve depositor-redeemer unlinkability.
-            // For full L2 verification, the fact hash would need to be computed
-            // off-chain and passed as a parameter instead.
-            let empty_input: Array<felt252> = array![];
-
-            // Compute fact hash using official Herodotus formula (architectural reference)
-            let fact_hash = calculate_cairo1_fact_hash(
-                SHIELD_CIRCUIT_PROGRAM_HASH, empty_input.span(), output.span(),
-            );
-
-            // Verify against Integrity FactRegistry on Starknet
-            // TODO: Enable hard assert for mainnet. Soft check on testnet for demo reliability.
+            // Verify the STARK proof was verified on L2 via Herodotus Integrity.
+            // The fact_hash is computed off-chain from Atlantic job metadata,
+            // preserving privacy by keeping circuit inputs (secret, merkle_path) off-chain.
             let (config, security_bits) = get_sharp_config();
             let integrity = Integrity::new();
-            let _is_valid = integrity
+            let is_valid = integrity
                 .with_config(config, security_bits)
                 .is_fact_hash_valid(fact_hash);
+            assert(is_valid, 'Proof not verified on L2');
 
             // --- EFFECTS (State update before interaction) ---
             self.nullifier_used.write(nullifier, true);

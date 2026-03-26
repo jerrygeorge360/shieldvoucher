@@ -1,0 +1,16 @@
+services:
+
+  shieldvoucher-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_CONTRACT_ADDRESS: ${VITE_CONTRACT_ADDRESS}
+        VITE_RPC_URL: ${VITE_RPC_URL}
+        VITE_ATLANTIC_API_KEY: ${VITE_ATLANTIC_API_KEY}
+    container_name: shieldvoucher-app
+    restart: always
+    ports:
+      - "8084:80"
+    env_file:
+      - ./.env

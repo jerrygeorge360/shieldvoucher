@@ -4,6 +4,7 @@ import { RedeemVoucher } from './components/RedeemVoucher'
 import { VoucherArt } from './components/VoucherArt'
 import { useWallet } from './starknet-provider'
 import './App.css'
+import logo from './utils/logo.svg'
 
 function App() {
   const [tab, setTab] = useState<'send' | 'redeem'>('send')
@@ -21,7 +22,14 @@ function App() {
   return (
     <div className="app-container">
       <nav className="header-nav">
-        <div className="logo mono">SHIELD_VOUCHER_V1.0</div>
+        <div className="logo cont">
+           <div>
+            <img src={logo} alt="Shield Voucher Logo" width={48} height={48} /> 
+           </div>
+           <div>
+            <h3 className="logo mono">SHIELD_VOUCHER_V1.0</h3>
+           </div>
+        </div>
         <div className="wallet-controls">
           {isConnected ? (
             <button className="btn mono" onClick={disconnectWallet}>

@@ -8,6 +8,30 @@ Built for the **PL Genesis Hackathon** — Starknet Privacy Track.
 
 ---
 
+## Table of Contents
+
+- [The Problem](#the-problem-with-bitcoin-payments-today)
+- [Bitcoin on Starknet](#bitcoin-on-starknet)
+- [Pitch Deck](#pitch-deck)
+- [Demo](#demo)
+- [Screenshots](#screenshots)
+- [How It Works](#how-it-works)
+- [Architecture](#architecture)
+- [Privacy Guarantees](#privacy-guarantees)
+- [Starknet Integration](#starknet-integration)
+- [Deployment](#deployment)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Key Features](#key-features)
+- [Roadmap](#roadmap)
+- [Security Considerations](#security-considerations)
+- [Team](#team)
+- [License](#license)
+
+---
+
 ## The Problem With Bitcoin Payments Today
 
 Bitcoin is often called digital cash — but it's the most transparent cash ever created. Every transaction is permanently public. Send someone Bitcoin, and anyone with an internet connection can see your wallet, their wallet, the exact amount, and the timestamp. Forever.
@@ -29,6 +53,12 @@ ShieldVoucher is built around the emerging Bitcoin-on-Starknet stack:
 > **Testnet note:** The current deployment uses a mock WBTC token on Starknet Sepolia. On mainnet, Garden Finance provides the canonical BTC → WBTC bridge, making ShieldVoucher a native part of the Bitcoin privacy stack on Starknet.
 
 This is the full vision: Bitcoin enters Starknet via Garden, gets shielded via ShieldVoucher, and moves privately — with cryptographic guarantees, not trust assumptions.
+
+---
+
+## Pitch Deck
+
+[ShieldVoucher](https://docs.google.com/presentation/d/1DrXvWQQ3B8Fm5oWD89P59ohT5hLoViZz/edit?usp=sharing&ouid=101068073277137374271&rtpof=true&sd=true)
 
 ---
 
@@ -292,6 +322,7 @@ cd frontend && npm run dev
 | Jerry George | Builder — contracts, circuit, frontend |
 
 ---
+
 
 ## License
 

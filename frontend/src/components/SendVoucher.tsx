@@ -33,6 +33,18 @@ export function SendVoucher({ connectedAddress }: Props) {
   const [isEncrypted, setIsEncrypted] = useState(false)
   const [txHash, setTxHash] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  async function copyToClipboard() {
+    if (!voucherCode) return
+    try {
+      await navigator.clipboard.writeText(voucherCode)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy!', err)
+    }
+  }
 
   function toSmallestUnits(value: string, decimals: number): bigint {
     const normalized = value.trim()
@@ -146,8 +158,8 @@ export function SendVoucher({ connectedAddress }: Props) {
                 if (!account || !connectedAddress) return alert('Connect wallet first');
                 setLoading(true);
                 try {
-                  const tx = await mintMockWBTC(account, connectedAddress, 1000000n); // 0.01 WBTC
-                  alert(`Success! 0.01 Test WBTC minted. Tx: ${tx}`);
+                  const tx = await mintMockWBTC(account, connectedAddress, 500000000n); // 5 WBTC
+                  alert(`Success! 5 Test WBTC minted. Tx: ${tx}`);
                 } catch (e: any) {
                   alert('Mint failed: ' + e.message);
                 } finally {
@@ -156,7 +168,7 @@ export function SendVoucher({ connectedAddress }: Props) {
               }}
               disabled={loading}
             >
-              [ GET_TEST_WBTC_FAUCET_0.01 ]
+              [ GET_TEST_WBTC_FAUCET_5 ]
             </button>
           </div>
         )}
@@ -164,7 +176,7 @@ export function SendVoucher({ connectedAddress }: Props) {
         {/* Refund Time Lock (PH-8) */}
         <div style={{ gridColumn: '1 / span 12' }} className="animate-fade-in-up">
           <div className="input-container">
-            <span className="input-label">REFUND_EMBARGO_PERIOD</span>
+            <span className="input-label">REFUND_EMBARGO_PERIOD // RECIPIENT_ACCESS_IS_ALWAYS_INSTANT</span>
             <div className="option-group">
               {LOCK_OPTIONS.map((opt) => (
                 <button
@@ -187,26 +199,121 @@ export function SendVoucher({ connectedAddress }: Props) {
       </div>
 
       {voucherCode && (
-        <div className="mt-4 animate-fade-in-up" style={{ padding: '4rem', background: isEncrypted ? '#E0F0E5' : '#F0EBE0', color: '#0D0D0D', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
-          <div className="mono" style={{ fontSize: '0.75rem', marginBottom: '2rem', borderBottom: '1px solid rgba(13,13,13,0.1)', paddingBottom: '1rem', opacity: 0.5 }}>
-            {isEncrypted ? 'ENCRYPTED // FOR_RECIPIENT_ONLY' : 'CLASSIFIED // UNENCRYPTED_SECRET'}
-          </div>
-          <h3 className="hero-medium mb-2">VOUCHER_PAYLOAD</h3>
-          <div className="mono" style={{ fontSize: isEncrypted ? '1rem' : '1.5rem', wordBreak: 'break-all', color: isEncrypted ? '#27AE60' : '#C0392B' }}>
-            {voucherCode}
-          </div>
-          <div className="mt-4 mono" style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-            <strong>UNLOCK_TIMESTAMP:</strong> {lockDuration === 0 ? 'AVAILABLE_IMMEDIATELY' : new Date(Date.now() + lockDuration * 1000).toLocaleString()}
-            {lockDuration === 0 && <span style={{ color: '#C0392B', marginLeft: '0.5rem' }}>⚠ TESTING ONLY — NO PRIVACY GUARANTEE</span>}
-          </div>
-          <p className="mt-4" style={{ fontSize: '0.9rem', opacity: 0.7 }}>
-            CAUTION: This code contains the plaintext secret. It will never be shown again. Ensure you save it securely.
-          </p>
-          {txHash && (
-            <div className="mt-4">
-              <a href={`https://sepolia.voyager.online/tx/${txHash}`} target="_blank" rel="noreferrer" className="mono underline text-xs">VERIFY_ON_EXPLORER_↗</a>
+        <div className="mt-8 animate-fade-in-up" style={{
+          padding: '3rem',
+          background: isEncrypted ? 'linear-gradient(135deg, #1A2E21 0%, #0D0D0D 100%)' : 'linear-gradient(135deg, #2E1A1A 0%, #0D0D0D 100%)',
+          color: '#F0EBE0',
+          position: 'relative',
+          border: `1px solid ${isEncrypted ? '#27AE6044' : '#C0392B44'}`,
+          borderRadius: '4px',
+          boxShadow: '0 40px 100px rgba(0,0,0,0.8)'
+        }}>
+          {/* Security Header */}
+          <div className="flex justify-between items-center mb-8 pb-4" style={{ borderBottom: '1px solid rgba(240,235,224,0.1)' }}>
+            <div className="mono" style={{ fontSize: '0.7rem', letterSpacing: '0.2em', opacity: 0.5 }}>
+              {isEncrypted ? 'SYSTEM_STATUS // ENCRYPTED_PAYLOAD' : 'SYSTEM_STATUS // UNENCRYPTED_SECRET'}
             </div>
-          )}
+            <div className="mono" style={{ fontSize: '0.7rem', color: isEncrypted ? '#27AE60' : '#C0392B' }}>
+              ● {isEncrypted ? 'SECURE_CHANNEL' : 'HIGH_RISK_WARNING'}
+            </div>
+          </div>
+
+          <div style={{ position: 'relative' }}>
+            <h3 className="hero-medium mb-4" style={{ fontSize: '1.5rem', letterSpacing: '0.05em' }}>VOUCHER_PAYLOAD</h3>
+            
+            <div className="mono" style={{
+              background: 'rgba(0,0,0,0.3)',
+              padding: '2rem',
+              borderRadius: '2px',
+              border: '1px solid rgba(240,235,224,0.1)',
+              fontSize: isEncrypted ? '0.9rem' : '1.2rem',
+              wordBreak: 'break-all',
+              lineHeight: '1.4',
+              color: isEncrypted ? '#27AE60' : '#F0EBE0',
+              position: 'relative',
+              marginBottom: '2rem'
+            }}>
+              {voucherCode}
+              
+              <button 
+                onClick={copyToClipboard}
+                style={{
+                  position: 'absolute',
+                  top: '1rem',
+                  right: '1rem',
+                  background: 'transparent',
+                  border: '1px solid rgba(240,235,224,0.2)',
+                  color: '#F0EBE0',
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.6rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  zIndex: 2,
+                  backdropFilter: 'blur(5px)'
+                }}
+                className="mono hover-bright"
+              >
+                {copied ? '[ COPIED_TO_BUFFER ]' : '[ COPY_SECRET ]'}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid-asymmetric" style={{ gap: '1.5rem' }}>
+            <div style={{ gridColumn: '1 / span 7' }}>
+              <div className="mono" style={{ fontSize: '0.6rem', opacity: 0.4, marginBottom: '0.5rem' }}>RECIPIENT_CLAIM_WINDOW</div>
+              <div className="mono" style={{ fontSize: '0.8rem', color: '#27AE60' }}>
+                ● INSTANT_ACCESS_GRANTEED
+              </div>
+            </div>
+            <div style={{ gridColumn: '8 / span 5', textAlign: 'right' }}>
+              <div className="mono" style={{ fontSize: '0.6rem', opacity: 0.4, marginBottom: '0.5rem' }}>SENDER_REFUND_LOCK</div>
+              <div className="mono" style={{ fontSize: '0.8rem' }}>
+                {lockDuration === 0 ? 'UNLOCKED' : new Date(Date.now() + lockDuration * 1000).toLocaleString()}
+              </div>
+            </div>
+            {txHash && (
+              <div style={{ gridColumn: '1 / span 12', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(240,235,224,0.05)' }}>
+                <div className="mono" style={{ fontSize: '0.6rem', opacity: 0.4, marginBottom: '0.5rem' }}>ON_CHAIN_PROOFS</div>
+                <a href={`https://sepolia.voyager.online/tx/${txHash}`} target="_blank" rel="noreferrer" 
+                   style={{ fontSize: '0.8rem', color: 'var(--accent)', textDecoration: 'none' }} className="mono hover-underline">
+                  VERIFY_STARKNET_TX_↗
+                </a>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 p-6" style={{ background: 'rgba(240,235,224,0.03)', border: '1px solid rgba(240,235,224,0.1)', borderRadius: '2px' }}>
+            <div className="mono mb-4" style={{ fontSize: '0.65rem', letterSpacing: '0.1em', color: 'var(--accent)' }}>ACCESS_PERMISSIONS_MATRIX</div>
+            <div className="grid-asymmetric" style={{ gap: '1rem' }}>
+              <div style={{ gridColumn: '1 / span 6' }}>
+                <div className="mono" style={{ fontSize: '0.6rem', opacity: 0.4, marginBottom: '0.5rem' }}>RECIPIENT (ANONYMOUS)</div>
+                <div className="mono" style={{ fontSize: '0.75rem', color: '#27AE60' }}>
+                  [✓] REDEEM // INSTANT<br/>
+                  [×] REFUND // UNAUTHORIZED
+                </div>
+              </div>
+              <div style={{ gridColumn: '7 / span 6' }}>
+                <div className="mono" style={{ fontSize: '0.6rem', opacity: 0.4, marginBottom: '0.5rem' }}>SENDER (PUBLIC_CREATOR)</div>
+                <div className="mono" style={{ fontSize: '0.75rem' }}>
+                  [×] REDEEM // PRIVACY_RISK<br/>
+                  {lockDuration === 0 ? (
+                    <span style={{ color: '#27AE60' }}>[✓] REFUND // AVAILABLE_NOW</span>
+                  ) : (
+                    <span style={{ opacity: 0.5 }}>[×] REFUND // LOCKED_BY_TIMER</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 pt-4 mono" style={{ fontSize: '0.65rem', borderTop: '1px solid rgba(240,235,224,0.05)', opacity: 0.5, lineHeight: '1.4' }}>
+              * Only the wallet that created this voucher can perform a refund. Anyone with the secret code (usually the recipient) can redeem it anonymously at any time.
+            </div>
+          </div>
+
+          <div className="mt-8 p-4" style={{ background: 'rgba(192, 57, 43, 0.1)', borderLeft: '2px solid #C0392B' }}>
+            <p className="mono" style={{ fontSize: '0.7rem', lineHeight: '1.5', margin: 0, color: '#F0EBE0' }}>
+              <strong style={{ color: '#C0392B' }}>SYSTEM_CRITICAL:</strong> This code is not stored on any server. Loss of this code results in permanent loss of assets unless the sender performs a refund after the lock window expires.
+            </p>
+          </div>
         </div>
       )}
     </div>

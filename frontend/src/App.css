@@ -332,6 +332,21 @@ select:focus+.input-label {
   animation: fadeInUp 0.5s ease forwards;
 }
 
+.hover-bright:hover {
+  filter: brightness(1.2);
+  border-color: rgba(240,235,224,0.5) !important;
+}
+
+.hover-underline:hover {
+  text-decoration: underline !important;
+}
+
+.flex { display: flex; }
+.justify-between { justify-content: space-between; }
+.items-center { align-items: center; }
+.mt-8 { margin-top: 2rem; }
+.pb-4 { padding-bottom: 1rem; }
+
 /* Toggle & Radio Customs - Re-engineered for High-End Industrial Feel */
 .option-group {
   display: flex;

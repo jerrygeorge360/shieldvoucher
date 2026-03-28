@@ -246,11 +246,26 @@ export function RedeemVoucher({ connectedAddress }: Props) {
       </div>
 
       {txHash && (
-        <div className="mt-4 animate-fade-in-up" style={{ padding: '2rem', border: '1px solid var(--border)' }}>
-          <div className="mono" style={{ fontSize: '0.75rem', color: '#27AE60', marginBottom: '1rem' }}>
-            TRANSACTION_VERIFIED // ANONYMOUS_RELEASE_COMPLETE
+        <div className="mt-8 animate-fade-in-up" style={{ 
+          padding: '3rem', 
+          background: 'linear-gradient(135deg, #1A2E21 0%, #0D0D0D 100%)',
+          border: '1px solid #27AE6044',
+          borderRadius: '4px',
+          boxShadow: '0 40px 100px rgba(0,0,0,0.8)'
+        }}>
+          <div className="flex justify-between items-center mb-6 pb-4" style={{ borderBottom: '1px solid rgba(240,235,224,0.1)' }}>
+            <div className="mono" style={{ fontSize: '0.7rem', color: '#27AE60' }}>
+              ● TRANSACTION_VERIFIED
+            </div>
+            <div className="mono" style={{ fontSize: '0.7rem', opacity: 0.5 }}>
+              STATUS // ANONYMOUS_RELEASE_COMPLETE
+            </div>
           </div>
-          <a href={`https://sepolia.voyager.online/tx/${txHash}`} target="_blank" rel="noreferrer" className="mono underline text-xs">
+          <div className="mono mb-6" style={{ fontSize: '0.9rem', color: '#F0EBE0' }}>
+            Funds have been successfully transmitted to the target address via Zero-Knowledge proof verification.
+          </div>
+          <a href={`https://sepolia.voyager.online/tx/${txHash}`} target="_blank" rel="noreferrer" 
+             style={{ fontSize: '0.8rem', color: 'var(--accent)', textDecoration: 'none' }} className="mono hover-underline">
             VIEW_PROOFS_ON_BLOCK_EXPLORER_↗
           </a>
         </div>

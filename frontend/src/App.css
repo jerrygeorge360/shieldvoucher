@@ -54,6 +54,16 @@ p {
   font-weight: 400;
 }
 
+
+.cont{
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  place-items: center;
+  
+  gap: 1rem;
+}
+
 /* Layout Elements */
 .app-container {
   max-width: 1440px;

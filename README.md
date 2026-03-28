@@ -232,6 +232,7 @@ cd frontend && npm run dev
 
 ### 1. Shield (Deposit)
 - Connect your Starknet wallet (ArgentX or Braavos)
+- Mint the WBTC token
 - Select WBTC and enter an amount
 - On mainnet: bridge real BTC first via [Garden Finance](https://garden.finance)
 - Click **Generate Protected Voucher**

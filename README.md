@@ -65,7 +65,7 @@ This is the full vision: Bitcoin enters Starknet via Garden, gets shielded via S
 ## Demo
 
 <!-- Add your demo video here. Recommended: record a 3–5 min Loom or YouTube video showing deposit → send → redeem flow -->
-[![ShieldVoucher Demo Video](https://img.shields.io/badge/Watch_Demo-3--5_min-red?style=for-the-badge&logo=youtube)](YOUR_VIDEO_LINK_HERE)
+[![ShieldVoucher Demo Video](https://img.shields.io/badge/Watch_Demo-3--5_min-red?style=for-the-badge&logo=youtube)](https://youtu.be/tu4ZKqHMH-s)
 
 ---
 
